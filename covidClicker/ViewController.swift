@@ -21,7 +21,7 @@ class ViewController: UIViewController
     var orbitDuration = 10.0
     
     // App Global Variables
-    var lumps = Double(10000000)
+    var lumps = Double(1000000000000000000000000)
     var lps = Double(0) // lumps per second
     var lumpName = "lump"
     
@@ -43,11 +43,16 @@ class ViewController: UIViewController
     
     // App Labels
     var lumpsDisplay = UILabel()
+    var lumpsDisplayBack = UILabel()
     
     // Orbiting labels
     var orbitCursors = [UILabel]()
     var circlePath = UIBezierPath()
     var animation = CAKeyframeAnimation()
+    
+    // Colors
+    var myFill = UIColor.gray.cgColor
+    var myBord = UIColor.white
     
     override func viewDidLoad()
     {
@@ -62,26 +67,37 @@ class ViewController: UIViewController
         clicker = UIButton(frame: CGRect(x: 0, y: 0, width: screenWidth*3/4, height: screenWidth*3/4))
         clicker.center = CGPoint(x:  screenWidth/2, y:  screenHeight/2)
         clicker.layer.cornerRadius = clicker.frame.width/2
-        clicker.layer.backgroundColor = UIColor.gray.cgColor
-        clicker.layer.borderColor = UIColor.black.cgColor
+        clicker.layer.backgroundColor = myFill
+        clicker.layer.borderColor = myBord.cgColor
         clicker.layer.borderWidth = 1
         clicker.addTarget(self, action: #selector(click), for: .touchUpInside)
         self.view.addSubview(clicker)
         
         lumpsDisplay = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/8))
         lumpsDisplay.center = CGPoint(x: screenWidth/2, y: screenHeight/8)
-        lumpsDisplay.layer.backgroundColor = UIColor.gray.cgColor
-        lumpsDisplay.layer.borderColor = UIColor.black.cgColor
-        lumpsDisplay.layer.borderWidth = 1
+        lumpsDisplay.layer.backgroundColor = myFill
         lumpsDisplay.numberOfLines = 2
-        lumpsDisplay.textColor = UIColor.white
+        lumpsDisplay.textColor = myBord
         lumpsDisplay.textAlignment = .center
+        lumpsDisplay.adjustsFontSizeToFitWidth = true
         self.view.addSubview(lumpsDisplay)
+        
+        lumpsDisplayBack = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/2*1.5, height: screenHeight/8*1.5))
+        lumpsDisplayBack.center = CGPoint(x: screenWidth/2, y: screenHeight/8)
+        lumpsDisplayBack.layer.backgroundColor = myFill
+        lumpsDisplayBack.layer.borderColor = myBord.cgColor
+        lumpsDisplayBack.layer.borderWidth = 1
+        lumpsDisplayBack.numberOfLines = 2
+        lumpsDisplayBack.textColor = myBord
+        lumpsDisplayBack.textAlignment = .center
+        lumpsDisplayBack.adjustsFontSizeToFitWidth = true
+        lumpsDisplayBack.layer.zPosition = -1
+        self.view.addSubview(lumpsDisplayBack)
         
         openShopButton = UIButton(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/8))
         openShopButton.center = CGPoint(x:  screenWidth/2, y:  screenHeight*15/16)
-        openShopButton.layer.backgroundColor = UIColor.gray.cgColor
-        openShopButton.layer.borderColor = UIColor.black.cgColor
+        openShopButton.layer.backgroundColor = myFill
+        openShopButton.layer.borderColor = myBord.cgColor
         openShopButton.layer.borderWidth = 1
         openShopButton.setTitle("Shop", for: .normal)
         openShopButton.addTarget(self, action: #selector(openShop), for: .touchUpInside)
@@ -90,13 +106,13 @@ class ViewController: UIViewController
         shopView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/2))
         shopView.contentSize = CGSize(width: screenWidth/2, height: screenHeight/8*CGFloat(items.count))
         shopView.center = CGPoint(x: screenWidth/2, y: screenHeight/2)
-        shopView.layer.backgroundColor = UIColor.green.cgColor
+        shopView.layer.backgroundColor = myFill
         self.view.addSubview(shopView)
         
         closeShopButton = UIButton(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/16))
-        closeShopButton.center = CGPoint(x:  screenWidth/2, y: shopView.frame.minY - closeShopButton.frame.height/2)
-        closeShopButton.layer.backgroundColor = UIColor.gray.cgColor
-        closeShopButton.layer.borderColor = UIColor.black.cgColor
+        closeShopButton.center = CGPoint(x:  screenWidth/2, y: shopView.frame.maxY + closeShopButton.frame.height/2)
+        closeShopButton.layer.backgroundColor = myFill
+        closeShopButton.layer.borderColor = myBord.cgColor
         closeShopButton.layer.borderWidth = 1
         closeShopButton.setTitle("Close", for: .normal)
         closeShopButton.addTarget(self, action: #selector(closeShop), for: .touchUpInside)
@@ -128,7 +144,7 @@ class ViewController: UIViewController
             
             let roundCost = String(format: "%.1f", itemCosts[i])
             button.setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]), for: .normal)
-            button.layer.borderColor = UIColor.black.cgColor
+            button.layer.borderColor = myBord.cgColor
             button.layer.borderWidth = 1.0
 
             button.addTarget(self, action: #selector(buyItem), for: .touchUpInside)
@@ -239,39 +255,40 @@ class ViewController: UIViewController
         
         // Transform/slide shop
         UIView.animate(withDuration: 0.6,
-        animations: {
+        animations:
+        {
             self.shopView.transform = CGAffineTransform(translationX: 0, y: -1*self.screenHeight)
             self.closeShopButton.transform = CGAffineTransform(translationX: 0, y: -1*self.screenHeight)
         },
         completion: { _ in
-            UIView.animate(withDuration: 0.6) {
+            UIView.animate(withDuration: 0) {
             }
         })
     }
     @objc func closeShop()
     {
-        // Enable other Buttons (clicker, openShop)
-        clicker.isEnabled = true
-        openShopButton.isEnabled = true
-        
         // Transform/slide shop back
-        UIView.animate(withDuration: 0.6,
-        animations: {
+        UIView.animate(withDuration: 0.4,
+        animations:
+        {
             self.shopView.transform = CGAffineTransform(translationX: 0, y: self.screenHeight)
             self.closeShopButton.transform = CGAffineTransform(translationX: 0, y: self.screenHeight)
         },
         completion: { _ in
-            UIView.animate(withDuration: 0.6) {
-
+            UIView.animate(withDuration: 0)
+            {
                 // Hide Shop
                 self.shopView.isHidden = true
                 self.closeShopButton.isHidden = true
+                // Enable other Buttons (clicker, openShop)
+                self.clicker.isEnabled = true
+                self.openShopButton.isEnabled = true
             }
         })
         
     }
-    override var prefersStatusBarHidden: Bool {
+    override var prefersStatusBarHidden: Bool
+    {
         return true
     }
 }
-

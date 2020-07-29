@@ -106,6 +106,7 @@ class ViewController: UIViewController
         updateLumpDisplay()
         
         let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
+        RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
 
     }
     @objc func incrementLps()

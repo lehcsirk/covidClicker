@@ -232,24 +232,43 @@ class ViewController: UIViewController
         // Disable other Buttons (clicker, openShop)
         clicker.isEnabled = false
         openShopButton.isEnabled = false
+        
         // Unhide Shop + close button
         shopView.isHidden = false
         closeShopButton.isHidden = false
+        
         // Transform/slide shop
-        shopView.center.y -= screenHeight
-        closeShopButton.center.y -= screenHeight
+        UIView.animate(withDuration: 0.6,
+        animations: {
+            self.shopView.transform = CGAffineTransform(translationX: 0, y: -1*self.screenHeight)
+            self.closeShopButton.transform = CGAffineTransform(translationX: 0, y: -1*self.screenHeight)
+        },
+        completion: { _ in
+            UIView.animate(withDuration: 0.6) {
+            }
+        })
     }
     @objc func closeShop()
     {
         // Enable other Buttons (clicker, openShop)
         clicker.isEnabled = true
         openShopButton.isEnabled = true
+        
         // Transform/slide shop back
-        shopView.center.y += screenHeight
-        closeShopButton.center.y += screenHeight
-        // Hide Shop
-        shopView.isHidden = true
-        closeShopButton.isHidden = true
+        UIView.animate(withDuration: 0.6,
+        animations: {
+            self.shopView.transform = CGAffineTransform(translationX: 0, y: self.screenHeight)
+            self.closeShopButton.transform = CGAffineTransform(translationX: 0, y: self.screenHeight)
+        },
+        completion: { _ in
+            UIView.animate(withDuration: 0.6) {
+
+                // Hide Shop
+                self.shopView.isHidden = true
+                self.closeShopButton.isHidden = true
+            }
+        })
+        
     }
 }
 

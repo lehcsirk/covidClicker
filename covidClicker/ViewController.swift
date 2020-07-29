@@ -21,7 +21,7 @@ class ViewController: UIViewController
     var orbitDuration = 10.0
     
     // App Global Variables
-    var lumps = Double(10000)
+    var lumps = Double(10000000)
     var lps = Double(0) // lumps per second
     var lumpName = "lump"
     
@@ -68,8 +68,6 @@ class ViewController: UIViewController
         clicker.addTarget(self, action: #selector(click), for: .touchUpInside)
         self.view.addSubview(clicker)
         
-        
-        
         lumpsDisplay = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/8))
         lumpsDisplay.center = CGPoint(x: screenWidth/2, y: screenHeight/8)
         lumpsDisplay.layer.backgroundColor = UIColor.gray.cgColor
@@ -108,26 +106,12 @@ class ViewController: UIViewController
         updateLumpDisplay()
         
         let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
-//        let timer2 = Timer.scheduledTimer(timeInterval: 1.0/animRate, target: self, selector: #selector(updateAnimations), userInfo: nil, repeats: true)
 
     }
     @objc func incrementLps()
     {
         lumps += lps/timerRate
         updateLumpDisplay()
-    }
-    @objc func updateAnimations()
-    {
-        if(orbitCursors.count > 0)
-        {
-            for i in 0...orbitCursors.count - 1
-            {
-                var radius = clicker.frame.width/2
-                var arclength = 2 * M_PI * Double(radius)/orbitDuration/animRate
-                var dist = distance(orbitCursors[i].center, CGPoint(x: screenWidth/2, y: screenHeight/2))
-                
-            }
-        }
     }
     func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
         let xDist = a.x - b.x
@@ -200,12 +184,22 @@ class ViewController: UIViewController
             cursor.layer.borderWidth = 1
             cursor.layer.borderColor = UIColor.red.cgColor
             cursor.layer.backgroundColor = UIColor.white.cgColor
+            cursor.layer.zPosition = -1
             self.view.addSubview(cursor)
             orbitCursors.append(cursor)
 
+            var smallRadius = orbitCursors[0].frame.size.width
+            if(orbitCursors.count > 10)
+            {
+                smallRadius *= 0.975
+            }
             for i in 0...orbitCursors.count - 1
             {
-                var mycirclePath = UIBezierPath(arcCenter: view.center, radius: clicker.frame.width/2, startAngle: .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), clockwise: true)
+                orbitCursors[i].frame.size.width = smallRadius
+                orbitCursors[i].frame.size.height = smallRadius
+                orbitCursors[i].layer.cornerRadius = smallRadius/2
+                
+                var mycirclePath = UIBezierPath(arcCenter: view.center, radius: clicker.frame.width/2 + smallRadius/2, startAngle: .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), clockwise: true)
                 var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
                 myanimation.duration = orbitDuration
                 myanimation.repeatCount = MAXFLOAT

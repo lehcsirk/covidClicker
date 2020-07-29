@@ -335,6 +335,7 @@ class ViewController: UIViewController
         openShopButton.isEnabled = false
         
         // Unhide Shop + close button
+        shopView.setContentOffset(CGPoint(x: 0.0, y: 0.0), animated: false)
         shopView.isHidden = false
         closeShopButton.isHidden = false
         

@@ -15,6 +15,9 @@ class ViewController: UIViewController
     var screenWidth = CGFloat(0)
     var screenHeight = CGFloat(0)
     
+    // Timer stuff
+    var timerRate = 10.0
+    
     // App Global Variables
     var lumps = Double(10000)
     var lps = Double(0) // lumps per second
@@ -22,10 +25,10 @@ class ViewController: UIViewController
     
     // Price=Base cost×1.15^(M−F) M = number type currently owned, F = number for free
     var items = ["Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank", "Temple", "Wizard Tower", "Shipment", "Alchemy Lab", "Portal", "Time Machine", "Antimatter Condensor", "Prism", "Chancemaker", "Fractal Engine", "Javascript Console"]
+    var baseItemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
     var itemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
     var itemProductions = [Double(0.1), Double(1), Double(8), Double(47), Double(260), Double(1400), Double(7800), Double(44000), Double(260000), Double(1600000), Double(10000000), Double(65000000), Double(430000000), Double(2900000000), Double(21000000000), Double(150000000000), Double(1100000000000)]
-    var itemQuantities = [Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0), Double(0)]
-    var itemLevels = [[Int]]()
+    var itemLevels = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     
     // App Buttons
     var clicker = UIButton()
@@ -34,6 +37,7 @@ class ViewController: UIViewController
     
     // App Views
     var shopView = UIScrollView()
+    var shopButtons = [UIButton]()
     
     // App Labels
     var lumpsDisplay = UILabel()
@@ -62,7 +66,6 @@ class ViewController: UIViewController
         lumpsDisplay.layer.borderColor = UIColor.black.cgColor
         lumpsDisplay.layer.borderWidth = 1
         lumpsDisplay.numberOfLines = 2
-        updateLumpDisplay()
 //        lumpsDisplay.text = lumpName + "s: " + String(Int(lumps)) + "\n" + lumpName + "s per second: " + String(Int(lps))
         
         lumpsDisplay.textAlignment = .center
@@ -93,15 +96,15 @@ class ViewController: UIViewController
         self.view.addSubview(closeShopButton)
         
         initializeShop()
+        updateLumpDisplay()
         
-        let timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
+        let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
         
 
     }
     @objc func incrementLps()
     {
-        print("Fire")
-        lumps += lps
+        lumps += lps/timerRate
         updateLumpDisplay()
     }
     func initializeShop()
@@ -109,12 +112,16 @@ class ViewController: UIViewController
         for i in 0...items.count - 1
         {
             var button = UIButton(frame: CGRect(x: CGFloat(0), y: CGFloat(i)*shopView.contentSize.height/CGFloat(items.count), width: shopView.contentSize.width, height: shopView.contentSize.height/CGFloat(items.count)))
-            button.setTitle(items[i], for: .normal)
+            button.titleLabel?.numberOfLines = 3
+            
+            let roundCost = String(format: "%.1f", itemCosts[i])
+            button.setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]), for: .normal)
             button.layer.borderColor = UIColor.black.cgColor
             button.layer.borderWidth = 1.0
 
             button.addTarget(self, action: #selector(buyItem), for: .touchUpInside)
             shopView.addSubview(button)
+            shopButtons.append(button)
         }
         shopView.center.y += screenHeight
         shopView.isHidden = true
@@ -124,6 +131,10 @@ class ViewController: UIViewController
     @objc func buyItem(sender: UIButton)
     {
         var itemName = String(sender.titleLabel!.text!)
+        print(itemName)
+        var index = itemName.firstIndex(of: "\n")!
+        itemName = String(itemName[...index])
+        itemName = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
         print(itemName)
         var num = -1
         var canPurchase = false
@@ -141,9 +152,9 @@ class ViewController: UIViewController
         }
         if(canPurchase)
         {
-            lumps -= itemCosts[num]
-            itemQuantities[num] += 1
-//            itemLevels[num][Int(itemQuantities[num])] += 1
+            lumps -= round(itemCosts[num])
+            itemLevels[num] += 1
+            itemCosts[num] = baseItemCosts[num] * pow(1.15, Double(itemLevels[num]))
             lps += itemProductions[num]
             updateLumpDisplay()
         }
@@ -157,17 +168,17 @@ class ViewController: UIViewController
         lumps += 1
         updateLumpDisplay()
     }
-    func roundfff(x: Double, y: Double)
-    {
-//        let z = Double(round(1000*x)/1000)
-//        print(z)
-    }
     func updateLumpDisplay()
     {
         let lumps2 = String(format: "%.1f", lumps)
         let lps2 = String(format: "%.1f", lps)
 
         lumpsDisplay.text = lumpName + "s: " + String(lumps2) + "\n" + lumpName + "s per second: " + String(lps2)
+        for i in 0...shopButtons.count - 1
+        {
+            let roundCost = String(format: "%.1f", itemCosts[i])
+            shopButtons[i].setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]), for: .normal)
+        }
     }
     @objc func openShop()
     {

@@ -112,7 +112,7 @@ class ViewController: UIViewController
         for i in 0...items.count - 1
         {
             var button = UIButton(frame: CGRect(x: CGFloat(0), y: CGFloat(i)*shopView.contentSize.height/CGFloat(items.count), width: shopView.contentSize.width, height: shopView.contentSize.height/CGFloat(items.count)))
-            button.titleLabel?.numberOfLines = 3
+            button.titleLabel?.numberOfLines = 4
             
             let roundCost = String(format: "%.1f", itemCosts[i])
             button.setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]), for: .normal)
@@ -172,12 +172,12 @@ class ViewController: UIViewController
     {
         let lumps2 = String(format: "%.1f", lumps)
         let lps2 = String(format: "%.1f", lps)
-
         lumpsDisplay.text = lumpName + "s: " + String(lumps2) + "\n" + lumpName + "s per second: " + String(lps2)
         for i in 0...shopButtons.count - 1
         {
+            let miniLps2 = String(format: "%.1f", Double(itemLevels[i])*itemProductions[i])
             let roundCost = String(format: "%.1f", itemCosts[i])
-            shopButtons[i].setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]), for: .normal)
+            shopButtons[i].setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]) + "\nLps: " + miniLps2, for: .normal)
         }
     }
     @objc func openShop()

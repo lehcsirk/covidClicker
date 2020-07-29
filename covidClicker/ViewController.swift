@@ -220,7 +220,7 @@ class ViewController: UIViewController
     {
         var itemName = String(sender.titleLabel!.text!)
         print(itemName)
-        var index = itemName.firstIndex(of: "\n")!
+        var index = itemName.firstIndex(of: " ")!
         itemName = String(itemName[...index])
         itemName = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
         print(itemName)

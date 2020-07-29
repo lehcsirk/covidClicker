@@ -23,7 +23,7 @@ class ViewController: UIViewController
     var timerRate = 10.0
     var orbitDuration = 10.0
     var timeSpent = 0.0
-    var startTime = NSDate()
+    var startTime = Double(Date().timeIntervalSince1970)
     
     // App Global Variables
     var lumps = Double(0)
@@ -77,6 +77,22 @@ class ViewController: UIViewController
         lumps = defaults.double(forKey: "lumps")
         lps = defaults.double(forKey: "lps")
         itemLevels = defaults.array(forKey: "itemLevels") as? [Int] ?? [Int]()
+        
+        if(!UserDefaults.exists(key: "startTime"))
+        {
+            defaults.set(startTime, forKey:"startTime")
+        }
+        else
+        {
+            startTime = defaults.double(forKey: "startTime")
+            var timeElapsed = Double(Date().timeIntervalSince1970) - startTime
+            if(timeElapsed > timeSpent)
+            {
+                lumps += lps * (timeElapsed - timeSpent)
+                timeSpent = timeElapsed
+            }
+            print(startTime)
+        }
         
         if(itemLevels.count <= 0)
         {
@@ -151,6 +167,14 @@ class ViewController: UIViewController
         {
             doAnimations()
         }
+        updateCosts()
+    }
+    func updateCosts()
+    {
+        for i in 0...baseItemCosts.count - 1
+        {
+            itemCosts[i] = baseItemCosts[i] * pow(1.15, Double(itemLevels[i]))
+        }
     }
     @objc func incrementLps()
     {
@@ -162,6 +186,7 @@ class ViewController: UIViewController
         defaults.set(lumps, forKey: "lumps")
         defaults.set(lps, forKey: "lps")
         defaults.set(itemLevels, forKey: "itemLevels")
+        defaults.set(startTime, forKey: "startTime")
     }
     func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
         let xDist = a.x - b.x
@@ -329,4 +354,11 @@ class ViewController: UIViewController
     {
         return true
     }
+}
+extension UserDefaults {
+
+    static func exists(key: String) -> Bool {
+        return UserDefaults.standard.object(forKey: key) != nil
+    }
+
 }

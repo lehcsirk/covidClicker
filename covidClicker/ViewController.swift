@@ -7,9 +7,13 @@
 //
 
 import UIKit
+import Foundation
+import QuartzCore
 
 class ViewController: UIViewController
 {
+    let defaults = UserDefaults.standard
+
     // Screen Stuff
     let screenSize = UIScreen.main.bounds
     var screenWidth = CGFloat(0)
@@ -18,6 +22,8 @@ class ViewController: UIViewController
     // Timer stuff
     var timerRate = 10.0
     var orbitDuration = 10.0
+    var timeSpent = 0.0
+    var startTime = NSDate()
     
     // App Global Variables
     var lumps = Double(0)
@@ -66,6 +72,17 @@ class ViewController: UIViewController
         screenWidth = screenSize.width
         screenHeight = screenSize.height
         
+        // NSUserDefaults Stuff
+        timeSpent = defaults.double(forKey: "timeSpent")
+        lumps = defaults.double(forKey: "lumps")
+        lps = defaults.double(forKey: "lps")
+        itemLevels = defaults.array(forKey: "itemLevels") as? [Int] ?? [Int]()
+        
+        if(itemLevels.count <= 0)
+        {
+            itemLevels = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        }
+        
         clicker = UIButton(frame: CGRect(x: 0, y: 0, width: screenWidth*3/4, height: screenWidth*3/4))
         clicker.center = CGPoint(x:  screenWidth/2, y:  screenHeight/2)
         clicker.layer.cornerRadius = clicker.frame.width/2
@@ -78,7 +95,7 @@ class ViewController: UIViewController
         lumpsDisplay = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/8))
         lumpsDisplay.center = CGPoint(x: screenWidth/2, y: screenHeight/8)
         lumpsDisplay.layer.backgroundColor = myFill
-        lumpsDisplay.numberOfLines = 2
+        lumpsDisplay.numberOfLines = 3
         lumpsDisplay.textColor = myBord
         lumpsDisplay.textAlignment = .center
         lumpsDisplay.adjustsFontSizeToFitWidth = true
@@ -126,12 +143,25 @@ class ViewController: UIViewController
         
         let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
-
+        for i in 0...itemLevels[0]
+        {
+            addItem(item: "Cursor")
+        }
+        if(orbitCursors.count > 0)
+        {
+            doAnimations()
+        }
     }
     @objc func incrementLps()
     {
         lumps += lps/timerRate
         updateLumpDisplay()
+        timeSpent += 1.0/timerRate
+        
+        defaults.set(timeSpent, forKey: "timeSpent")
+        defaults.set(lumps, forKey: "lumps")
+        defaults.set(lps, forKey: "lps")
+        defaults.set(itemLevels, forKey: "itemLevels")
     }
     func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
         let xDist = a.x - b.x
@@ -209,25 +239,28 @@ class ViewController: UIViewController
             self.view.addSubview(cursor)
             orbitCursors.append(cursor)
 
-            var smallRadius = orbitCursors[0].frame.size.width
-            if(orbitCursors.count > 10)
-            {
-                smallRadius *= 0.975
-            }
-            for i in 0...orbitCursors.count - 1
-            {
-                orbitCursors[i].frame.size.width = smallRadius
-                orbitCursors[i].frame.size.height = smallRadius
-                orbitCursors[i].layer.cornerRadius = smallRadius/2
-                
-                var mycirclePath = UIBezierPath(arcCenter: view.center, radius: clicker.frame.width/2 + smallRadius/2, startAngle: .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), clockwise: true)
-                var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
-                myanimation.duration = orbitDuration
-                myanimation.repeatCount = MAXFLOAT
-                myanimation.path = mycirclePath.cgPath
-                orbitCursors[i].layer.add(myanimation, forKey: nil)
-            }
+            doAnimations()
+        }
+    }
+    func doAnimations()
+    {
+        var smallRadius = orbitCursors[0].frame.size.width
+        if(orbitCursors.count > 10)
+        {
+            smallRadius *= 0.975
+        }
+        for i in 0...orbitCursors.count - 1
+        {
+            orbitCursors[i].frame.size.width = smallRadius
+            orbitCursors[i].frame.size.height = smallRadius
+            orbitCursors[i].layer.cornerRadius = smallRadius/2
             
+            var mycirclePath = UIBezierPath(arcCenter: view.center, radius: clicker.frame.width/2 + smallRadius/2, startAngle: .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), clockwise: true)
+            var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
+            myanimation.duration = orbitDuration
+            myanimation.repeatCount = MAXFLOAT
+            myanimation.path = mycirclePath.cgPath
+            orbitCursors[i].layer.add(myanimation, forKey: nil)
         }
     }
     @objc func click()
@@ -239,7 +272,8 @@ class ViewController: UIViewController
     {
         let lumps2 = String(format: "%.1f", lumps)
         let lps2 = String(format: "%.1f", lps)
-        lumpsDisplay.text = lumpName + "s: " + String(lumps2) + "\n" + lumpName + "s per second: " + String(lps2)
+        let time2 = String(format: "%.1f", timeSpent)
+        lumpsDisplay.text = "time elapsed: " + time2 + "\n" + lumpName + "s: " + String(lumps2) + "\n" + lumpName + "s per second: " + String(lps2)
         for i in 0...shopButtons.count - 1
         {
             let miniLps2 = String(format: "%.1f", Double(itemLevels[i])*itemProductions[i])

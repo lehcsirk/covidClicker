@@ -17,15 +17,14 @@ class ViewController: UIViewController
     
     // Timer stuff
     var timerRate = 10.0
-    var animRate = 10.0
     var orbitDuration = 10.0
     
     // App Global Variables
-    var lumps = Double(1000000000000000000000000)
+    var lumps = Double(0)
     var lps = Double(0) // lumps per second
     var lumpName = "lump"
     
-    // Price=Base cost×1.15^(M−F) M = number type currently owned, F = number for free
+    // Items
     var items = ["Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank", "Temple", "Wizard Tower", "Shipment", "Alchemy Lab", "Portal", "Time Machine", "Antimatter Condensor", "Prism", "Chancemaker", "Fractal Engine", "Javascript Console"]
     var baseItemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
     var itemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
@@ -54,6 +53,9 @@ class ViewController: UIViewController
     var myFill = UIColor.gray.cgColor
     var myBord = UIColor.white
     
+    // Fonts
+    var myFont = UIFont(name: "Courier", size: 50)
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -80,6 +82,7 @@ class ViewController: UIViewController
         lumpsDisplay.textColor = myBord
         lumpsDisplay.textAlignment = .center
         lumpsDisplay.adjustsFontSizeToFitWidth = true
+        lumpsDisplay.font = myFont
         self.view.addSubview(lumpsDisplay)
         
         lumpsDisplayBack = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/2*1.5, height: screenHeight/8*1.5))
@@ -141,6 +144,7 @@ class ViewController: UIViewController
         {
             var button = UIButton(frame: CGRect(x: CGFloat(0), y: CGFloat(i)*shopView.contentSize.height/CGFloat(items.count), width: shopView.contentSize.width, height: shopView.contentSize.height/CGFloat(items.count)))
             button.titleLabel?.numberOfLines = 4
+            button.titleLabel?.adjustsFontSizeToFitWidth = true
             
             let roundCost = String(format: "%.1f", itemCosts[i])
             button.setTitle(items[i] + "\nCost: " + roundCost + "\nLevel: " + String(itemLevels[i]), for: .normal)

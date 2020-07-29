@@ -286,6 +286,7 @@ class ViewController: UIViewController
             myanimation.duration = orbitDuration
             myanimation.repeatCount = MAXFLOAT
             myanimation.path = mycirclePath.cgPath
+            myanimation.isRemovedOnCompletion = false
             orbitCursors[i].layer.add(myanimation, forKey: nil)
         }
     }

@@ -143,6 +143,9 @@ class ViewController: UIViewController
         shopView.contentSize = CGSize(width: screenWidth/2, height: screenHeight/8*CGFloat(items.count))
         shopView.center = CGPoint(x: screenWidth/2, y: screenHeight/2)
         shopView.layer.backgroundColor = myFill
+        shopView.layer.borderColor = myBord.cgColor
+        shopView.layer.borderWidth = 1.0
+        shopView.layer.backgroundColor = myFill
         self.view.addSubview(shopView)
         
         closeShopButton = UIButton(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/16))
@@ -187,6 +190,22 @@ class ViewController: UIViewController
         defaults.set(lps, forKey: "lps")
         defaults.set(itemLevels, forKey: "itemLevels")
         defaults.set(startTime, forKey: "startTime")
+        
+        if(!UserDefaults.exists(key: "startTime"))
+        {
+            defaults.set(startTime, forKey:"startTime")
+        }
+        else
+        {
+            startTime = defaults.double(forKey: "startTime")
+            var timeElapsed = Double(Date().timeIntervalSince1970) - startTime
+            if(timeElapsed > timeSpent)
+            {
+                lumps += lps * (timeElapsed - timeSpent)
+                timeSpent = timeElapsed
+            }
+            print(startTime)
+        }
     }
     func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
         let xDist = a.x - b.x

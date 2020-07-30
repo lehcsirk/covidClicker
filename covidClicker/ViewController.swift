@@ -31,11 +31,12 @@ class ViewController: UIViewController
     var lumpName = "lump"
     
     // Items
-    var items = ["Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank", "Temple", "Wizard Tower", "Shipment", "Alchemy Lab", "Portal", "Time Machine", "Antimatter Condensor", "Prism", "Chancemaker", "Fractal Engine", "Javascript Console"]
+    var items = ["Handshaker", "Boomer", "Gym", "Bar", "Park", "Theatre", "Concert", "Sports Stadium", "Amusement Park", "Airport", "Science Lab", "Propoganda", "Mask Defabricator", "Vaccine Nullifier", "Pandemic", "Alien Contact", "CRISPR"]
     var baseItemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
     var itemCosts = [Double(15.0), Double(100.0), Double(1100.0), Double(12000.0), Double(130000.0), Double(1400000.0), Double(20000000.0), Double(330000000.0), Double(5100000000.0), Double(75000000000.0), Double(1000000000000.0), Double(14000000000000.0), Double(170000000000000.0), Double(2100000000000000.0), Double(26000000000000000.0), Double(310000000000000000.0), Double(71000000000000000000.0)]
     var itemProductions = [Double(0.1), Double(1), Double(8), Double(47), Double(260), Double(1400), Double(7800), Double(44000), Double(260000), Double(1600000), Double(10000000), Double(65000000), Double(430000000), Double(2900000000), Double(21000000000), Double(150000000000), Double(1100000000000)]
     var itemLevels = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    var itemColors = [UIColor.red, UIColor.blue, UIColor.green, UIColor.orange, UIColor.purple, UIColor.yellow, UIColor.red, UIColor.blue, UIColor.green, UIColor.orange, UIColor.purple, UIColor.yellow, UIColor.red, UIColor.blue, UIColor.green, UIColor.orange, UIColor.purple, UIColor.yellow, UIColor.red, UIColor.blue]
     
     // App Buttons
     var clicker = UIButton()
@@ -51,7 +52,7 @@ class ViewController: UIViewController
     var lumpsDisplayBack = UILabel()
     
     // Orbiting labels
-    var orbitCursors = [UILabel]()
+    var orbitCursors = [[UILabel]]()
     var circlePath = UIBezierPath()
     var animation = CAKeyframeAnimation()
     
@@ -161,13 +162,32 @@ class ViewController: UIViewController
         
         let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
-        for i in 0...itemLevels[0]
+        
+        for i in 0...items.count - 1
         {
-            addItem(item: "Cursor")
+            orbitCursors.append([])
+        }
+        
+        for i in 0...itemLevels.count - 1
+        {
+            if(itemLevels[i] - 1 > 0)
+            {
+                for j in 0...itemLevels[i] - 1
+                {
+                    addItem(item: items[i])
+                }
+            }
         }
         if(orbitCursors.count > 0)
         {
-            doAnimations()
+            for i in 0...orbitCursors.count - 1
+            {
+                if(orbitCursors[i].count > 0)
+                {
+                    doAnimations()
+                    break
+                }
+            }
         }
         updateCosts()
     }
@@ -265,40 +285,58 @@ class ViewController: UIViewController
     }
     func addItem(item: String)
     {
-        if(item == "Cursor")
+        for i in 0...items.count - 1
         {
-            var cursor = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/8, height: screenWidth/8))
-            cursor.layer.cornerRadius = cursor.frame.width/2
-            cursor.layer.borderWidth = 1
-            cursor.layer.borderColor = UIColor.red.cgColor
-            cursor.layer.backgroundColor = UIColor.white.cgColor
-            cursor.layer.zPosition = -1
-            self.view.addSubview(cursor)
-            orbitCursors.append(cursor)
-
-            doAnimations()
+            if(item == items[i])
+            {
+                if(itemLevels[i] > 0)
+                {
+                    var cursor = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/8, height: screenWidth/8))
+                    cursor.layer.cornerRadius = cursor.frame.width/2
+                    cursor.layer.borderWidth = 1
+                    cursor.layer.borderColor = itemColors[i].cgColor
+                    cursor.layer.backgroundColor = UIColor.white.cgColor
+                    cursor.layer.zPosition = 1
+                    self.view.addSubview(cursor)
+                    orbitCursors[i].append(cursor)
+                    print("Added a " + items[i])
+                }
+            }
         }
+        doAnimations()
     }
     func doAnimations()
     {
-        var smallRadius = orbitCursors[0].frame.size.width
-        if(orbitCursors.count > 10)
+        print("In anim")
+        if(orbitCursors.count > 0)
         {
-            smallRadius *= 0.975
-        }
-        for i in 0...orbitCursors.count - 1
-        {
-            orbitCursors[i].frame.size.width = smallRadius
-            orbitCursors[i].frame.size.height = smallRadius
-            orbitCursors[i].layer.cornerRadius = smallRadius/2
-            
-            var mycirclePath = UIBezierPath(arcCenter: view.center, radius: clicker.frame.width/2 + smallRadius/2, startAngle: .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors.count)*CGFloat(i), clockwise: true)
-            var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
-            myanimation.duration = orbitDuration
-            myanimation.repeatCount = MAXFLOAT
-            myanimation.path = mycirclePath.cgPath
-            myanimation.isRemovedOnCompletion = false
-            orbitCursors[i].layer.add(myanimation, forKey: nil)
+            var smallRadius = CGFloat(0)
+            smallRadius = (screenWidth - clicker.frame.width)/2
+            if(orbitCursors[0].count > 10)
+            {
+                smallRadius *= 0.975
+            }
+            for i in 0...orbitCursors.count - 1
+            {
+                if(orbitCursors[i].count > 0)
+                {
+                    for j in 0...orbitCursors[i].count - 1
+                    {
+                        orbitCursors[i][j].frame.size.width = smallRadius
+                        orbitCursors[i][j].frame.size.height = smallRadius
+                        orbitCursors[i][j].layer.cornerRadius = smallRadius/2
+                        var radius = (clicker.frame.width/2 + smallRadius/2)
+                        radius *= CGFloat(orbitCursors.count - i)/CGFloat(orbitCursors.count)
+                        var mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j), clockwise: true)
+                        var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
+                        myanimation.duration = orbitDuration
+                        myanimation.repeatCount = MAXFLOAT
+                        myanimation.path = mycirclePath.cgPath
+                        myanimation.isRemovedOnCompletion = false
+                        orbitCursors[i][j].layer.add(myanimation, forKey: nil)
+                    }
+                }
+            }
         }
     }
     @objc func click()

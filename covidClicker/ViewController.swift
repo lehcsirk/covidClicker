@@ -301,14 +301,12 @@ class ViewController: UIViewController
                 cursor.layer.zPosition = -1
                 self.view.addSubview(cursor)
                 orbitCursors[i].append(cursor)
-                print("Added a " + items[i])
             }
         }
         doAnimations()
     }
     func doAnimations()
     {
-        print("In anim")
         if(orbitCursors.count > 0)
         {
             var smallRadius = CGFloat(0)

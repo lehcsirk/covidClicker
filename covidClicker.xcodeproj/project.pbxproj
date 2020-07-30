@@ -35,7 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7E8B13B424D133F200DB4899 /* covidClicker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = covidClicker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E8B13B424D133F200DB4899 /* Corona.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Corona.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E8B13B724D133F200DB4899 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E8B13B924D133F200DB4899 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7E8B13BB24D133F200DB4899 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -89,7 +89,7 @@
 		7E8B13B524D133F200DB4899 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7E8B13B424D133F200DB4899 /* covidClicker.app */,
+				7E8B13B424D133F200DB4899 /* Corona.app */,
 				7E8B13CA24D133F600DB4899 /* covidClickerTests.xctest */,
 				7E8B13D524D133F600DB4899 /* covidClickerUITests.xctest */,
 			);
@@ -145,7 +145,7 @@
 			);
 			name = covidClicker;
 			productName = covidClicker;
-			productReference = 7E8B13B424D133F200DB4899 /* covidClicker.app */;
+			productReference = 7E8B13B424D133F200DB4899 /* Corona.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7E8B13C924D133F600DB4899 /* covidClickerTests */ = {
@@ -443,7 +443,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Krischel.covidClicker;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Corona;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -462,7 +462,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Krischel.covidClicker;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Corona;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

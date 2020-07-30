@@ -105,6 +105,7 @@ class ViewController: UIViewController
         clicker.layer.backgroundColor = myFill
         clicker.layer.borderColor = myBord.cgColor
         clicker.layer.borderWidth = 1
+        clicker.layer.zPosition = -2
         clicker.addTarget(self, action: #selector(click), for: .touchUpInside)
         self.view.addSubview(clicker)
         
@@ -146,6 +147,7 @@ class ViewController: UIViewController
         shopView.layer.borderColor = myBord.cgColor
         shopView.layer.borderWidth = 1.0
         shopView.layer.backgroundColor = myFill
+        shopView.layer.zPosition = 1
         self.view.addSubview(shopView)
         
         closeShopButton = UIButton(frame: CGRect(x: 0, y: 0, width: screenWidth/2, height: screenHeight/16))
@@ -163,14 +165,15 @@ class ViewController: UIViewController
         let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
         
-        for i in 0...items.count - 1
-        {
-            orbitCursors.append([])
-        }
+//        for i in 0...items.count - 1
+//        {
+//            orbitCursors.append([])
+//        }
+        orbitCursors = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
         
         for i in 0...itemLevels.count - 1
         {
-            if(itemLevels[i] - 1 > 0)
+            if(itemLevels[i] > 0)
             {
                 for j in 0...itemLevels[i] - 1
                 {
@@ -178,14 +181,18 @@ class ViewController: UIViewController
                 }
             }
         }
+        print("Zoop")
         if(orbitCursors.count > 0)
         {
             for i in 0...orbitCursors.count - 1
             {
                 if(orbitCursors[i].count > 0)
                 {
-                    doAnimations()
-                    break
+                    for i in 0...orbitCursors[i].count - 1
+                    {
+                        doAnimations()
+                        break
+                    }
                 }
             }
         }
@@ -289,18 +296,15 @@ class ViewController: UIViewController
         {
             if(item == items[i])
             {
-                if(itemLevels[i] > 0)
-                {
-                    var cursor = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/8, height: screenWidth/8))
-                    cursor.layer.cornerRadius = cursor.frame.width/2
-                    cursor.layer.borderWidth = 1
-                    cursor.layer.borderColor = itemColors[i].cgColor
-                    cursor.layer.backgroundColor = UIColor.white.cgColor
-                    cursor.layer.zPosition = 1
-                    self.view.addSubview(cursor)
-                    orbitCursors[i].append(cursor)
-                    print("Added a " + items[i])
-                }
+                var cursor = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/8, height: screenWidth/8))
+                cursor.layer.cornerRadius = cursor.frame.width/2
+                cursor.layer.borderWidth = 1
+                cursor.layer.borderColor = itemColors[i].cgColor
+                cursor.layer.backgroundColor = UIColor.white.cgColor
+                cursor.layer.zPosition = -1
+                self.view.addSubview(cursor)
+                orbitCursors[i].append(cursor)
+                print("Added a " + items[i])
             }
         }
         doAnimations()
@@ -316,6 +320,8 @@ class ViewController: UIViewController
             {
                 smallRadius *= 0.975
             }
+            var radius = (clicker.frame.width/2 + smallRadius/2)
+            var isClockwise = true
             for i in 0...orbitCursors.count - 1
             {
                 if(orbitCursors[i].count > 0)
@@ -325,9 +331,18 @@ class ViewController: UIViewController
                         orbitCursors[i][j].frame.size.width = smallRadius
                         orbitCursors[i][j].frame.size.height = smallRadius
                         orbitCursors[i][j].layer.cornerRadius = smallRadius/2
-                        var radius = (clicker.frame.width/2 + smallRadius/2)
-                        radius *= CGFloat(orbitCursors.count - i)/CGFloat(orbitCursors.count)
-                        var mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j), endAngle: .pi*2 + .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j), clockwise: true)
+                        
+                        var mycirclePath = UIBezierPath()
+                        var myStart = .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
+                        var myEnd = .pi*2 + .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
+                        if(isClockwise)
+                        {
+                        mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myStart, endAngle: myEnd, clockwise: isClockwise)
+                        }
+                        else
+                        {
+                            mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myEnd, endAngle: myStart, clockwise: isClockwise)
+                        }
                         var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
                         myanimation.duration = orbitDuration
                         myanimation.repeatCount = MAXFLOAT
@@ -335,6 +350,9 @@ class ViewController: UIViewController
                         myanimation.isRemovedOnCompletion = false
                         orbitCursors[i][j].layer.add(myanimation, forKey: nil)
                     }
+                    radius -= smallRadius
+                    smallRadius *= 0.75
+                    isClockwise = !isClockwise
                 }
             }
         }
@@ -360,6 +378,7 @@ class ViewController: UIViewController
     }
     @objc func openShop()
     {
+        lumps += 1000000
         // Disable other Buttons (clicker, openShop)
         clicker.isEnabled = false
         openShopButton.isEnabled = false

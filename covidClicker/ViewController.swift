@@ -33,7 +33,7 @@ class ViewController: UIViewController
     // Items
     var items = ["Cursor", "Grandma", "Farm", "Mine", "Factory", "Bank", "Temple", "Wizard Tower", "Shipment", "Alchemy Lab", "Portal", "Time Machine", "Antimatter Condensor", "Prism", "Chancemaker", "Fractal Engine", "Javascript Console"]
     var baseItemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
-    var itemCosts = [Double(15), Double(100), Double(1100), Double(12000), Double(130000), Double(1400000), Double(20000000), Double(330000000), Double(5100000000), Double(75000000000), Double(1000000000000), Double(14000000000000), Double(170000000000000), Double(2100000000000000), Double(26000000000000000), Double(310000000000000000), Double(71000000000000000000)]
+    var itemCosts = [Double(15.0), Double(100.0), Double(1100.0), Double(12000.0), Double(130000.0), Double(1400000.0), Double(20000000.0), Double(330000000.0), Double(5100000000.0), Double(75000000000.0), Double(1000000000000.0), Double(14000000000000.0), Double(170000000000000.0), Double(2100000000000000.0), Double(26000000000000000.0), Double(310000000000000000.0), Double(71000000000000000000.0)]
     var itemProductions = [Double(0.1), Double(1), Double(8), Double(47), Double(260), Double(1400), Double(7800), Double(44000), Double(260000), Double(1600000), Double(10000000), Double(65000000), Double(430000000), Double(2900000000), Double(21000000000), Double(150000000000), Double(1100000000000)]
     var itemLevels = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     
@@ -91,7 +91,6 @@ class ViewController: UIViewController
                 lumps += lps * (timeElapsed - timeSpent)
                 timeSpent = timeElapsed
             }
-            print(startTime)
         }
         
         if(itemLevels.count <= 0)
@@ -204,7 +203,6 @@ class ViewController: UIViewController
                 lumps += lps * (timeElapsed - timeSpent)
                 timeSpent = timeElapsed
             }
-            print(startTime)
         }
     }
     func distance(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
@@ -238,11 +236,9 @@ class ViewController: UIViewController
     @objc func buyItem(sender: UIButton)
     {
         var itemName = String(sender.titleLabel!.text!)
-        print(itemName)
-        var index = itemName.firstIndex(of: " ")!
+        var index = itemName.index(of: " Level")!
         itemName = String(itemName[...index])
-        itemName = itemName.trimmingCharacters(in: .whitespacesAndNewlines)
-        print(itemName)
+        itemName = itemName.substring(to: itemName.index(before: itemName.endIndex))
         var num = -1
         var canPurchase = false
         for i in 0...items.count - 1
@@ -265,10 +261,6 @@ class ViewController: UIViewController
             lps += itemProductions[num]
             updateLumpDisplay()
             addItem(item: items[num])
-        }
-        else
-        {
-            print("Can't afford that")
         }
     }
     func addItem(item: String)
@@ -384,4 +376,37 @@ extension UserDefaults {
         return UserDefaults.standard.object(forKey: key) != nil
     }
 
+}
+extension StringProtocol
+{
+    func index<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+        range(of: string, options: options)?.lowerBound
+    }
+    func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+        range(of: string, options: options)?.upperBound
+    }
+    func indices<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Index] {
+        var indices: [Index] = []
+        var startIndex = self.startIndex
+        while startIndex < endIndex,
+            let range = self[startIndex...]
+                .range(of: string, options: options) {
+                indices.append(range.lowerBound)
+                startIndex = range.lowerBound < range.upperBound ? range.upperBound :
+                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+        }
+        return indices
+    }
+    func ranges<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Range<Index>] {
+        var result: [Range<Index>] = []
+        var startIndex = self.startIndex
+        while startIndex < endIndex,
+            let range = self[startIndex...]
+                .range(of: string, options: options) {
+                result.append(range)
+                startIndex = range.lowerBound < range.upperBound ? range.upperBound :
+                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+        }
+        return result
+    }
 }

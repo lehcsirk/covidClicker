@@ -165,12 +165,10 @@ class ViewController: UIViewController
         let timer = Timer.scheduledTimer(timeInterval: 1.0/timerRate, target: self, selector: #selector(incrementLps), userInfo: nil, repeats: true)
         RunLoop.main.add(timer, forMode: RunLoop.Mode.common)
         
-//        for i in 0...items.count - 1
-//        {
-//            orbitCursors.append([])
-//        }
-        orbitCursors = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-        
+        for i in 0...items.count - 1
+        {
+            orbitCursors.append([])
+        }
         for i in 0...itemLevels.count - 1
         {
             if(itemLevels[i] > 0)
@@ -181,7 +179,6 @@ class ViewController: UIViewController
                 }
             }
         }
-        print("Zoop")
         if(orbitCursors.count > 0)
         {
             for i in 0...orbitCursors.count - 1
@@ -263,7 +260,7 @@ class ViewController: UIViewController
     @objc func buyItem(sender: UIButton)
     {
         var itemName = String(sender.titleLabel!.text!)
-        var index = itemName.index(of: " Level")!
+        let index = itemName.index(of: " Level")!
         itemName = String(itemName[...index])
         itemName = itemName.substring(to: itemName.index(before: itemName.endIndex))
         var num = -1
@@ -333,8 +330,8 @@ class ViewController: UIViewController
                         orbitCursors[i][j].layer.cornerRadius = smallRadius/2
                         
                         var mycirclePath = UIBezierPath()
-                        var myStart = .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
-                        var myEnd = .pi*2 + .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
+                        let myStart = .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
+                        let myEnd = .pi*2 + .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
                         if(isClockwise)
                         {
                         mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myStart, endAngle: myEnd, clockwise: isClockwise)
@@ -378,7 +375,6 @@ class ViewController: UIViewController
     }
     @objc func openShop()
     {
-        lumps += 1000000
         // Disable other Buttons (clicker, openShop)
         clicker.isEnabled = false
         openShopButton.isEnabled = false
@@ -427,31 +423,35 @@ class ViewController: UIViewController
         return true
     }
 }
-extension UserDefaults {
-
-    static func exists(key: String) -> Bool {
+extension UserDefaults
+{
+    static func exists(key: String) -> Bool
+    {
         return UserDefaults.standard.object(forKey: key) != nil
     }
-
 }
 extension StringProtocol
 {
-    func index<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+    func index<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index?
+    {
         range(of: string, options: options)?.lowerBound
     }
-    func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+    func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index?
+    {
         range(of: string, options: options)?.upperBound
     }
-    func indices<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Index] {
+    func indices<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Index]
+    {
         var indices: [Index] = []
         var startIndex = self.startIndex
         while startIndex < endIndex,
             let range = self[startIndex...]
-                .range(of: string, options: options) {
+                .range(of: string, options: options)
+            {
                 indices.append(range.lowerBound)
                 startIndex = range.lowerBound < range.upperBound ? range.upperBound :
                     index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
-        }
+            }
         return indices
     }
     func ranges<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Range<Index>] {
@@ -459,11 +459,12 @@ extension StringProtocol
         var startIndex = self.startIndex
         while startIndex < endIndex,
             let range = self[startIndex...]
-                .range(of: string, options: options) {
+                .range(of: string, options: options)
+            {
                 result.append(range)
                 startIndex = range.lowerBound < range.upperBound ? range.upperBound :
                     index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
-        }
+            }
         return result
     }
 }

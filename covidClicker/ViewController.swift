@@ -347,10 +347,10 @@ class ViewController: UIViewController
                         myanimation.isRemovedOnCompletion = false
                         orbitCursors[i][j].layer.add(myanimation, forKey: nil)
                     }
-                    radius -= smallRadius
-                    smallRadius *= 0.75
-                    isClockwise = !isClockwise
                 }
+                radius -= smallRadius
+                smallRadius *= 0.75
+                isClockwise = !isClockwise
             }
         }
     }

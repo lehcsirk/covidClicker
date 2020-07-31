@@ -339,13 +339,13 @@ class ViewController: UIViewController
                             break
                         }
                     }
+                    if(radius - smallRadius > 2)
+                    {
+                        radius -= smallRadius*1.75/2
+                    }
                     if(smallRadius * 0.75 > 2)
                     {
                         smallRadius *= 0.75
-                    }
-                    if(radius - smallRadius > 2)
-                    {
-                        radius -= smallRadius
                     }
                     if(myDuration * 0.75 > 2)
                     {

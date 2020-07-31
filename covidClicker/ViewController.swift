@@ -55,6 +55,7 @@ class ViewController: UIViewController
     var orbitCursors = [[UILabel]]()
     var circlePath = UIBezierPath()
     var animation = CAKeyframeAnimation()
+    var orbitCount = 10
     
     // Colors
     var myFill = UIColor.gray.cgColor
@@ -173,23 +174,9 @@ class ViewController: UIViewController
         {
             if(itemLevels[i] > 0)
             {
-                for j in 0...itemLevels[i] - 1
+                for j in 0...9//itemLevels[i] - 1
                 {
                     addItem(item: items[i])
-                }
-            }
-        }
-        if(orbitCursors.count > 0)
-        {
-            for i in 0...orbitCursors.count - 1
-            {
-                if(orbitCursors[i].count > 0)
-                {
-                    for i in 0...orbitCursors[i].count - 1
-                    {
-                        doAnimations()
-                        break
-                    }
                 }
             }
         }
@@ -293,14 +280,17 @@ class ViewController: UIViewController
         {
             if(item == items[i])
             {
-                var cursor = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/8, height: screenWidth/8))
-                cursor.layer.cornerRadius = cursor.frame.width/2
-                cursor.layer.borderWidth = 1
-                cursor.layer.borderColor = itemColors[i].cgColor
-                cursor.layer.backgroundColor = UIColor.white.cgColor
-                cursor.layer.zPosition = -1
-                self.view.addSubview(cursor)
-                orbitCursors[i].append(cursor)
+                if(orbitCursors[i].count < orbitCount)
+                {
+                    var cursor = UILabel(frame: CGRect(x: 0, y: 0, width: screenWidth/8, height: screenWidth/8))
+                    cursor.layer.cornerRadius = cursor.frame.width/2
+                    cursor.layer.borderWidth = 1
+                    cursor.layer.borderColor = itemColors[i].cgColor
+                    cursor.layer.backgroundColor = UIColor.white.cgColor
+                    cursor.layer.zPosition = -1
+                    self.view.addSubview(cursor)
+                    orbitCursors[i].append(cursor)
+                }
             }
         }
         doAnimations()
@@ -311,44 +301,62 @@ class ViewController: UIViewController
         {
             var smallRadius = CGFloat(0)
             smallRadius = (screenWidth - clicker.frame.width)/2
-            if(orbitCursors[0].count > 10)
-            {
-                smallRadius *= 0.975
-            }
             var radius = (clicker.frame.width/2 + smallRadius/2)
             var isClockwise = true
+            var myDuration = orbitDuration
             for i in 0...orbitCursors.count - 1
             {
                 if(orbitCursors[i].count > 0)
                 {
                     for j in 0...orbitCursors[i].count - 1
                     {
-                        orbitCursors[i][j].frame.size.width = smallRadius
-                        orbitCursors[i][j].frame.size.height = smallRadius
-                        orbitCursors[i][j].layer.cornerRadius = smallRadius/2
-                        
-                        var mycirclePath = UIBezierPath()
-                        let myStart = .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
-                        let myEnd = .pi*2 + .pi*2/CGFloat(orbitCursors[i].count)*CGFloat(j)
-                        if(isClockwise)
+                        if(j < orbitCount)
                         {
-                        mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myStart, endAngle: myEnd, clockwise: isClockwise)
+                            orbitCursors[i][j].frame.size.width = smallRadius
+                            orbitCursors[i][j].frame.size.height = smallRadius
+                            orbitCursors[i][j].layer.cornerRadius = smallRadius/2
+                            
+                            var mycirclePath = UIBezierPath()
+                            let myStart = .pi*2*CGFloat(j)/CGFloat(orbitCount)
+                            let myEnd = .pi*2 + .pi*2*CGFloat(j)/CGFloat(orbitCount)
+                            if(isClockwise)
+                            {
+                                mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myStart, endAngle: myEnd, clockwise: isClockwise)
+                            }
+                            else
+                            {
+                                mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myEnd, endAngle: myStart, clockwise: isClockwise)
+                            }
+                            var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
+                            myanimation.duration = myDuration
+                            myanimation.repeatCount = MAXFLOAT
+                            myanimation.path = mycirclePath.cgPath
+                            myanimation.isRemovedOnCompletion = false
+                            orbitCursors[i][j].layer.add(myanimation, forKey: nil)
                         }
                         else
                         {
-                            mycirclePath = UIBezierPath(arcCenter: view.center, radius: radius, startAngle: myEnd, endAngle: myStart, clockwise: isClockwise)
+                            break
                         }
-                        var myanimation = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
-                        myanimation.duration = orbitDuration
-                        myanimation.repeatCount = MAXFLOAT
-                        myanimation.path = mycirclePath.cgPath
-                        myanimation.isRemovedOnCompletion = false
-                        orbitCursors[i][j].layer.add(myanimation, forKey: nil)
                     }
+                    if(smallRadius * 0.75 > 2)
+                    {
+                        smallRadius *= 0.75
+                    }
+                    if(radius - smallRadius > 2)
+                    {
+                        radius -= smallRadius
+                    }
+                    if(myDuration * 0.75 > 2)
+                    {
+                        myDuration *= 0.9
+                    }
+//                    isClockwise = !isClockwise
                 }
-                radius -= smallRadius
-                smallRadius *= 0.75
-                isClockwise = !isClockwise
+                else
+                {
+                    break
+                }
             }
         }
     }
